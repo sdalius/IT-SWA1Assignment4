@@ -1,0 +1,18 @@
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/rxjs/7.4.0/rxjs.umd.min.js" integrity="sha384-wqc/bG3ySkqmZgtyoAVI5uDgVTkdXmiAKg1hB1l6F8gmoYS5jhOfTBa7CY5PCCjk" crossorigin="anonymous"></script>
+	<script src="./js/scripts.js"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body onload="setSeverity()">
+    <div>
+        <div>Enter minimum severity level
+            <input id="severityInput" type="text" onblur="setSeverity()" value="2"/> <br>
+            Enter your desired severity level and press anywhere <br>
+            <button id="btnPauseWarnings" type="button" onclick="pause()">Pause warnings</button>
+        </div>
+        <div id="warningList">
+        </div>
+    </div>
+</body>
+</html>
