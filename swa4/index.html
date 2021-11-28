@@ -1,0 +1,89 @@
+<html>
+<head>
+    <meta charSet="UTF-8">
+    <title>Title</title>
+    <script type="module">
+       import { Warnings } from "./index.js";
+       import { Subject,BehaviorSubject, from } from 'https://dev.jspm.io/rxjs@6/_esm2015';
+       import { filter } from 'https://dev.jspm.io/rxjs@6/_esm2015/operators';
+       import { messages } from "./index.js";
+
+       let warnings
+       let ws
+       let warningsOn
+
+       const subject = new Subject()
+
+
+       window.warningsOnOff = () => {
+
+           if(warningsOn===true){
+               unSubscribe()
+               document.getElementById("warnings").style.display = "none"
+               messages = []
+               warningsOn=false
+           }else {
+               location.reload()
+               warningsOn=true
+           }
+       }
+
+       window.unSubscribe = () =>{
+           ws.onopen = () => {
+               const message = "unsubscribe"
+               ws.send(message)
+           }
+       }
+
+       window.onChangeSeverity = () => {
+
+           let severity =  document.getElementById("sev").value;
+
+          let ul = document.getElementById('warnings')
+           while (ul.firstChild) {
+               ul.removeChild(ul.firstChild)
+
+           }
+           const source = from(messages);
+
+          console.log(messages.length)
+         const modified = source.pipe(
+             filter(v => v.severity >= severity)
+         )
+
+
+          modified.subscribe((x) => {warnings.retrieveData(x,true)})
+
+       }
+
+       window.load = () => {
+           console.log("something")
+           warnings = new Warnings()
+           ws = new WebSocket("ws://localhost:8090/warnings")
+           warningsOn = true
+           const subject = new Subject()
+           ws.onopen = () => {
+               const message = "subscribe"
+               ws.send(message)
+
+               subject.subscribe(warnings.retrieveData)
+           }
+           ws.onmessage = message => {
+               subject.next(message)
+           }
+       }
+    </script>
+</head>
+<body onload="load()">
+<div>
+    <button onclick="warningsOnOff()">Warnings on/off</button>
+</div>
+    <label for="sev"> Set severity:</label>
+    <input type="number" id="sev" name="fname"><br><br>
+    <button id="btn" onclick="onChangeSeverity()">Submit</button>
+<div>
+    Warnings:<br>
+    <ul id="warnings"></ul>
+</div>
+</body>
+</html>
